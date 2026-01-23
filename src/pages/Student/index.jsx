@@ -1,15 +1,17 @@
 import Navbar from "../../components/NavBar"
 import user1 from "../../assets/user1.png"
-import StudentCard from "../../components/StudentCard"
+import StudentCard from "../../components/PeopleCard"
 import useToggleList from "../../hooks/useToggleList"
 import { students } from "../../store"
 import { Medal } from "lucide-react"
 import DownloadButton from "../../components/DownloadButton"
+import PeopleCard from "../../components/PeopleCard"
 
 
 
 
 export default function Student() {
+
     const { visible, toggle } = useToggleList();
 
     return (
@@ -17,10 +19,10 @@ export default function Student() {
             <Navbar />
             <div className="mx-auto pt-10 px-50 ">
                 <div className="flex  max-w-7x1 mx-auto p-10 justify-between items-center">
-                    <StudentCard image={user1} student="Lúcio Freitas" generalInfo="Estudante, 16 anos" state="Maceió/AL" />
+                    <PeopleCard image={user1} student="Lúcio Freitas" generalInfo="Estudante, 16 anos" state="Maceió/AL" />
                     <div>
                         <div className="p-10 items-center">
-                            <button onClick={toggle}>
+                            <button className="cursor-pointer" onClick={toggle}>
                                 {visible ? "Ver Eventos/Modalidades" : "Ver Eventos/Modalidades"}
                             </button>
                             <br />

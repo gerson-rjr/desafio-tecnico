@@ -2,6 +2,7 @@ import certificate1 from "../assets/certificate1.pdf"
 import certificate2 from "../assets/certificate2.pdf"
 import certificate3 from "../assets/certificate3.pdf"
 import user1 from "../assets/user1.png"
+import user2 from "../assets/user2.png"
 
 export const students = [
     {
@@ -38,6 +39,36 @@ export const students = [
             },
         ],
         image: user1,
+    }
+
+]
+
+export const teacher = [
+    {
+
+    }
+]
+
+export const teacherEvents = [
+    {
+        id: 1,
+        eventName: "Olimpíada Brasileira de Robótica Teórica",
+        studentsSubscribed: [
+            { id: 1, studentName: "Lucio Freitas", studentAge: "16" },
+            { id: 2, studentName: "Joana Darc", studentAge: "15" },
+            { id: 3, studentName: "Paulo Farias", studentAge: "14" },
+            { id: 4, studentName: "Joice Batista", studentAge: "14" },
+        ]
+    },
+    {
+        id: 2,
+        eventName: "Mostra Nacional de Robótica - Mundial",
+        studentsSubscribed: [
+            { id: 1, studentName: "Luciano Lima", studentAge: "17" },
+            { id: 2, studentName: "João Pedro", studentAge: "15" },
+            { id: 3, studentName: "Cida Costa", studentAge: "14" },
+            { id: 4, studentName: "Lauren de Sousa", studentAge: "15" },
+        ]
     }
 
 ]
