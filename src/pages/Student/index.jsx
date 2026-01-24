@@ -17,9 +17,9 @@ export default function Student() {
     return (
         <>
             <Navbar />
-            <div className="mx-auto pt-10 px-50 ">
-                <div className="flex  max-w-7x1 mx-auto p-10 justify-between items-center">
-                    <PeopleCard image={user1} student="Lúcio Freitas" generalInfo="Estudante, 16 anos" state="Maceió/AL" />
+            <div className="mx-auto pt-10 px-50">
+                <div className="flex max-w-7x1 mx-auto p-10 justify-between items-center">
+                    <PeopleCard image={user1} people="Lúcio Freitas" generalInfo="Estudante, 16 anos" state="Maceió/AL" />
                     <div>
                         <div className="p-10 items-center">
                             <button className="cursor-pointer" onClick={toggle}>
@@ -37,7 +37,6 @@ export default function Student() {
                 <div>
                     {visible && (
                         <>
-
                             <div className="border-t-1 border-sky-700" />
                             <ul className="flex">
                                 <li className="flex-8 text text-center">Nome do Evento</li>
