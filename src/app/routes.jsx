@@ -5,6 +5,7 @@ import Teacher from "../pages/Teacher"
 import NotFound from "../pages/NotFound";
 import ProofCorrection from "../pages/ProofCorrection";
 
+
 export const router = createBrowserRouter([
     {
         path: '/',
