@@ -3,6 +3,7 @@ import Home from "../pages/Home";
 import Student from "../pages/Student"
 import Teacher from "../pages/Teacher"
 import NotFound from "../pages/NotFound";
+import ProofCorrection from "../pages/ProofCorrection";
 
 export const router = createBrowserRouter([
     {
@@ -16,6 +17,10 @@ export const router = createBrowserRouter([
     {
         path: '/teacher',
         element: <Teacher/>,
+    },
+    {
+        path: '/proof-correction',
+        element: <ProofCorrection/>,
     },
     {
         path: '*',

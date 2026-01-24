@@ -3,28 +3,20 @@ import user1 from "../../assets/user1.png"
 import useToggleList from "../../hooks/useToggleList"
 import { students } from "../../store"
 import { Medal } from "lucide-react"
-// import DownloadButton from "../../components/DownloadButton"
 import PeopleCard from "../../components/PeopleCard"
-import { useCertificateSelection } from "../../hooks/useCertificationSelection"
-
-
-
-
+import { useCertificatesDownload } from "../../hooks/useCertificatesDownload"
 
 
 export default function Student() {
 
     const { visible, toggle } = useToggleList();
     const {
-        student,
-        events,
         selectedCertificates,
-        loading,
-        toggleCertificate,
+        toggleSelected,
         selectAll,
         clearSelection,
         downloadZip
-    } = useCertificateSelection(students)
+    } = useCertificatesDownload([students[0]])
 
     return (
         <div className="min-h-screen bg-neutral-200">
@@ -93,15 +85,17 @@ export default function Student() {
                                         {!event.isEvaluative && '-'}
                                     </div>
                                     <div className="md:col-span-2 flex items-center justify-center">
+                                        {event.isEvaluative && (
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedCertificates.some(
+                                                    item => item.certificate === event.certificate
+                                                )}
+                                                onChange={() => toggleSelected(event)}
+                                                className="w-4 h-4  accent-sky-950 cursor-pointer"
+                                            />
+                                        )}
 
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedCertificates.some(
-                                                item => item.certificate === event.certificate
-                                            )}
-                                            onChange={() => toggleCertificate(event)}
-                                            className="w-4 h-4  accent-sky-950 cursor-pointer"
-                                        />
                                     </div>
 
                                 </li>
@@ -130,12 +124,10 @@ export default function Student() {
 
                         <button
                             onClick={downloadZip}
-                            disabled={selectedCertificates.length === 0 || loading}
+                            disabled={selectedCertificates.length === 0}
                             className="px-4 py-2 rounded-lg bg-sky-950 text-white disabled:opacity-40"
                         >
-                            {loading
-                                ? 'Gerando ZIP...'
-                                : `Baixar ZIP (${selectedCertificates.length})`}
+                            {`Baixar ZIP (${selectedCertificates.length})`}
                         </button>
                     </div>
                 )}

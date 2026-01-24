@@ -1,5 +1,6 @@
 import { Menu, X } from "lucide-react";
 import useToggleList from "../hooks/useToggleList";
+import logo from "../assets/logo.png"
 
 
 const Navbar = () => {
@@ -10,7 +11,10 @@ const Navbar = () => {
             <div className="flex flex-col justify-between">
                 <div className="flex justify-between">
                     <a href="/" className="p-10">
-                        <span className="text-4xl font-bold text-neutral-200">O L I M P O</span>
+                        <div className="flex flex-row">
+                            <img className="h-10 min-h-10 pr-4 items-center" src={logo} alt="" />
+                            <span className="text-4xl font-bold text-neutral-200">O L I M P O</span>
+                        </div>
                     </a>
                     <div className="hidden lg:flex justify-center space-x-12 items-center pr-10">
                         <a href="/student" className="text-neutral-500 text-lg hover:underline">Sou Estudante</a>
