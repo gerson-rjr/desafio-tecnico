@@ -1,11 +1,13 @@
 import Navbar from "../../components/NavBar"
 import user1 from "../../assets/user1.png"
-import StudentCard from "../../components/PeopleCard"
 import useToggleList from "../../hooks/useToggleList"
 import { students } from "../../store"
 import { Medal } from "lucide-react"
-import DownloadButton from "../../components/DownloadButton"
+// import DownloadButton from "../../components/DownloadButton"
 import PeopleCard from "../../components/PeopleCard"
+import { useCertificateSelection } from "../../hooks/useCertificationSelection"
+
+
 
 
 
@@ -13,104 +15,132 @@ import PeopleCard from "../../components/PeopleCard"
 export default function Student() {
 
     const { visible, toggle } = useToggleList();
+    const {
+        student,
+        events,
+        selectedCertificates,
+        loading,
+        toggleCertificate,
+        selectAll,
+        clearSelection,
+        downloadZip
+    } = useCertificateSelection(students)
 
     return (
-        <>
-            <Navbar />
-            <div className="mx-auto pt-10 px-50">
-                <div className="flex max-w-7x1 mx-auto p-10 justify-between items-center">
-                    <PeopleCard image={user1} people="Lúcio Freitas" generalInfo="Estudante, 16 anos" state="Maceió/AL" />
-                    <div>
-                        <div className="p-10 items-center">
-                            <button className="cursor-pointer" onClick={toggle}>
-                                {visible ? "Ver Eventos/Modalidades" : "Ver Eventos/Modalidades"}
-                            </button>
-                            <br />
-                            <button>
-                                Alterar Informações
-                            </button>
-                        </div>
+        <div className="min-h-screen bg-neutral-200">
+            <header className="bg-sky-950">
+                <Navbar />
+            </header>
+            <main className="max-w-7xl mx-auto px-4 py-8 space-y-10">
+                <section className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+
+                    <PeopleCard
+                        image={user1}
+                        people={students[0].name}
+                        email={students[0].email}
+                        {...console.log(students[0])}
+                        generalInfo={"Estudante, " + students[0].age + " anos"}
+                        state={students[0].state}
+                    />
+
+                    <div className="flex flex-col sm:flex-row gap-3">
+                        <button
+                            onClick={toggle}
+                            className="px-4 py-2 rounded-lg border border-sky-950 text-sky-950 hover:bg-sky-950 hover:text-white transition"
+                        >
+                            EVENTOS E MODALIDADES
+                        </button>
+
+                        <button
+                            className="px-4 py-2 rounded-lg border border-sky-950 text-sky-950 hover:bg-sky-950 hover:text-white transition"
+                        >
+                            ALTERAR INFORMAÇÕES
+                        </button>
                     </div>
+                </section>
+                {visible && (
+                    <section className="bg-white rounded-xl shadow overflow-hidden">
+                        <div className="hidden md:grid grid-cols-12 gap-4 bg-neutral-100 px-6 py-4 font-semibold text-sky-950">
+                            <div className="col-span-6 text-center">Evento</div>
+                            <div className="col-span-2 text-center">Avaliação</div>
+                            <div className="col-span-2 text-center">Medalha</div>
+                            <div className="col-span-2 text-center">Certificado</div>
+                        </div>
 
-                </div>
+                        <ul className="divide-y">
+                            {students[0].events.map((event, index) => (
+                                <li
+                                    key={index}
+                                    className="grid grid-cols-1 md:grid-cols-12 gap-4 px-6 py-4 items-center"
+                                >
+                                    <div className="md:col-span-6 text-center md:text-left font-medium text-sky-950">
+                                        {event.eventName}
+                                    </div>
 
-                <div>
-                    {visible && (
-                        <>
-                            <div className="border-t-1 border-sky-700" />
-                            <ul className="flex">
-                                <li className="flex-8 text text-center">Nome do Evento</li>
-                                <li className="flex-2 text-center">Avaliação</li>
-                                <li className="flex-2 text-center">Medalha</li>
-                                <li className="flex-2 text-center">Certificado</li>
-                            </ul>
-                            {students.map((student, index) => (
-                                <ul key={index}>
-                                    {student.events.map((evnt, index) => (
-                                        <ul className="flex" key={index}>
-                                            {evnt.isEvaluative ?
-                                                <>
-                                                    <li className="flex-8 text text-center">{evnt.eventName}</li>
-                                                    <li className="flex-2 text text-center">{evnt.grade}/100</li>
-                                                    {evnt.medal == 1 ? (
-                                                        <>
+                                    <div className="md:col-span-2 text-center text-neutral-700">
+                                        {event.isEvaluative ? `${event.grade}/100` : '-'}
+                                    </div>
+                                    <div className="md:col-span-2 flex justify-center">
+                                        {event.isEvaluative && event.medal === 1 && (
+                                            <Medal className="text-amber-400" />
+                                        )}
+                                        {event.isEvaluative && event.medal === 2 && (
+                                            <Medal className="text-gray-300" />
+                                        )}
+                                        {event.isEvaluative && event.medal === 3 && (
+                                            <Medal className="text-amber-900" />
+                                        )}
+                                        {!event.isEvaluative && '-'}
+                                    </div>
+                                    <div className="md:col-span-2 flex items-center justify-center">
 
-                                                            <li className="flex-2 text-center ">
-                                                                <Medal className=" text-amber-400 items-center" />
-                                                            </li>
-                                                        </>
-                                                    ) : ""
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedCertificates.some(
+                                                item => item.certificate === event.certificate
+                                            )}
+                                            onChange={() => toggleCertificate(event)}
+                                            className="w-4 h-4  accent-sky-950 cursor-pointer"
+                                        />
+                                    </div>
 
-                                                    }
-                                                    {evnt.medal == 2 ? (
-                                                        <>
-                                                            <li className="flex-2 text-center">
-                                                                <Medal className="text-gray-300 items-center" />
-                                                            </li>
-                                                        </>
-                                                    ) : ""
+                                </li>
+                            ))
+                            }
+                        </ul>
 
-                                                    }
-                                                    {evnt.medal == 3 ? (
-                                                        <>
-                                                            <li className="bg-red-200 flex-2 text text-center">
-                                                                <Medal className="text-amber-900 items-center" />
-                                                            </li>
-                                                        </>
-                                                    ) : ""
+                    </section>
+                )}
+                {visible && (
+                    <div className="flex gap-3 justify-end">
+                        <button
+                            onClick={() => selectAll(students)}
+                            className="px-4 py-2 rounded-lg border border-sky-950 text-sky-950"
+                        >
+                            Selecionar todos
+                        </button>
 
-                                                    }
-                                                    <li className="flex-2 text text-center">
-                                                        <DownloadButton file={evnt.certificate} name={`${evnt.eventName}.pdf`} />
-                                                    </li>
-                                                </>
+                        <button
+                            onClick={clearSelection}
+                            disabled={selectedCertificates.length === 0}
+                            className="px-4 py-2 rounded-lg border border-neutral-400 disabled:opacity-40"
+                        >
+                            Limpar
+                        </button>
 
-                                                :
-                                                (
-                                                    <>
-                                                        <li className="flex-8 text text-center">
-                                                            {evnt.eventName}
-                                                        </li>
-                                                        <li className="flex-2 text text-center">
-                                                            -
-                                                        </li>
-                                                        <li className="flex-2 text text-center">
-                                                            -
-                                                        </li>
-                                                        <li className="flex-2 text text-center">
-                                                            -
-                                                        </li>
-                                                    </>
-                                                )}
-                                        </ul>
-                                    ))}
-                                </ul>
-                            ))}
+                        <button
+                            onClick={downloadZip}
+                            disabled={selectedCertificates.length === 0 || loading}
+                            className="px-4 py-2 rounded-lg bg-sky-950 text-white disabled:opacity-40"
+                        >
+                            {loading
+                                ? 'Gerando ZIP...'
+                                : `Baixar ZIP (${selectedCertificates.length})`}
+                        </button>
+                    </div>
+                )}
+            </main>
+        </div>
 
-                        </>
-                    )}
-                </div>
-            </div>
-        </>
     )
 }

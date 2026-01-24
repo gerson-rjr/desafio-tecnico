@@ -1,4 +1,4 @@
-export default function PeopleCard({image: image, people: people, generalInfo: generalInfo, state: state}) {
+export default function PeopleCard({image: image, people: people, generalInfo: generalInfo, email: email, state: state}) {
     return (
         <div className="flex">
             <div>
@@ -7,6 +7,7 @@ export default function PeopleCard({image: image, people: people, generalInfo: g
             <div className="p-10 flex items-center">
                 <ul className="text-center flex-col">
                     <li className="text-2xl">{people}</li>
+                    <li className="text-sm">{email}</li>
                     <li className="text-sm">{generalInfo}</li>
                     <li className="text-sm">{state}</li>
                 </ul>
