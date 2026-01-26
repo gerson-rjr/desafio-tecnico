@@ -125,7 +125,7 @@ export default function Student() {
                         <button
                             onClick={downloadZip}
                             disabled={selectedCertificates.length === 0}
-                            className="px-4 py-2 rounded-lg bg-sky-950 text-white disabled:opacity-40"
+                            className="px-4 py-2 text-center rounded-lg bg-sky-950 text-white disabled:opacity-40"
                         >
                             {`Baixar ZIP (${selectedCertificates.length})`}
                         </button>
