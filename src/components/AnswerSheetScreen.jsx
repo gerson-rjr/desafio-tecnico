@@ -8,27 +8,25 @@ export default function AnswerSheetScreen() {
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [studentName, setStudentName] = useState("");
-  const [students, setStudents] = useState([]);
+  const [setStudents] = useState([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [editing, setEditing] = useState(false);
 
   const inputRef = useRef();
+  const answerInputRef = useRef(null);
 
-  /* =========================
-     Upload múltiplo
-  ========================= */
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files || []);
-    if (selectedFiles.length === 0) return;
+    if (!selectedFiles.length) return;
 
     setFiles(selectedFiles);
     setCurrentIndex(0);
     setDetectedAnswers({});
+    setCurrentQuestionIndex(0);
   };
 
-  /* =========================
-     Pré-processamento
-  ========================= */
-  const preprocessImage = (file) => {
-    return new Promise((resolve) => {
+  const preprocessImage = (file) =>
+    new Promise((resolve) => {
       const img = new Image();
       img.onload = () => {
         const canvas = document.createElement("canvas");
@@ -41,7 +39,8 @@ export default function AnswerSheetScreen() {
         const data = imageData.data;
 
         for (let i = 0; i < data.length; i += 4) {
-          const gray = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+          const gray =
+            0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
           const value = gray > 180 ? 255 : 0;
           data[i] = data[i + 1] = data[i + 2] = value;
         }
@@ -52,17 +51,15 @@ export default function AnswerSheetScreen() {
 
       img.src = URL.createObjectURL(file);
     });
-  };
 
-  /* =========================
-     OCR
-  ========================= */
   const handleProcess = async () => {
     if (!files[currentIndex] || !studentName.trim()) return;
 
     setLoading(true);
     setProgress(0);
     setDetectedAnswers({});
+    setCurrentQuestionIndex(0);
+    setEditing(false);
 
     try {
       const canvas = await preprocessImage(files[currentIndex]);
@@ -81,7 +78,11 @@ export default function AnswerSheetScreen() {
 
       if (matches) {
         matches.forEach((letter, index) => {
-          answers[`Q${index + 1}`] = letter.toUpperCase();
+          answers[`Questão ${index + 1}`] = {
+            ocrValue: letter.toUpperCase(),
+            finalValue: letter.toUpperCase(),
+            source: "ocr",
+          };
         });
       }
 
@@ -93,9 +94,6 @@ export default function AnswerSheetScreen() {
     setLoading(false);
   };
 
-  /* =========================
-     Confirmar correção
-  ========================= */
   const handleConfirmStudent = () => {
     setStudents((prev) => [
       ...prev,
@@ -109,34 +107,36 @@ export default function AnswerSheetScreen() {
     setDetectedAnswers({});
     setStudentName("");
     setProgress(0);
+    setEditing(false);
 
     if (currentIndex < files.length - 1) {
       setCurrentIndex((prev) => prev + 1);
     }
   };
 
+  const entries = Object.entries(detectedAnswers);
+  const current = entries[currentQuestionIndex];
+
   return (
     <div className="min-h-screen bg-neutral-200 p-6">
       <h2 className="text-3xl font-bold text-sky-950 text-center mb-8">
-        Correção de Provas
+        CORREÇÃO AUTOMÁTICA OBR TEÓRICA
       </h2>
 
-      {/* Nome do aluno */}
       <div className="flex justify-center mb-4">
         <input
           type="text"
           placeholder="Nome do aluno"
           value={studentName}
           onChange={(e) => setStudentName(e.target.value)}
-          className="px-4 py-2 rounded-lg border border-neutral-400 focus:ring-2 focus:ring-sky-950"
+          className="px-4 py-2 rounded-lg border focus:ring-2 focus:ring-sky-950"
         />
       </div>
 
-      {/* Upload */}
       <div className="flex justify-center gap-4 mb-6">
         <button
           onClick={() => inputRef.current.click()}
-          className="px-6 py-3 bg-sky-950 text-white rounded-lg shadow hover:bg-sky-900"
+          className="px-6 py-3 bg-sky-950 text-white rounded-lg"
         >
           Selecionar Imagens
         </button>
@@ -150,95 +150,117 @@ export default function AnswerSheetScreen() {
         />
       </div>
 
-      {/* Processar */}
       {files[currentIndex] && (
         <div className="text-center mb-6">
-          <p className="font-medium text-sky-950 mb-2">
-            {files[currentIndex].name}
-          </p>
+          <p className="mb-2 font-medium">{files[currentIndex].name}</p>
           <button
             onClick={handleProcess}
             disabled={loading || !studentName.trim()}
-            className="px-5 py-2 bg-sky-950 text-white rounded-lg hover:bg-sky-900 disabled:opacity-50"
+            className="px-5 py-2 bg-sky-950 text-white rounded-lg disabled:opacity-50"
           >
             {loading ? "Processando..." : "Detectar Respostas"}
           </button>
         </div>
       )}
 
-      {/* Progresso */}
       {loading && (
         <div className="mb-6">
-          <p className="text-sky-950 mb-1">Progresso: {progress}%</p>
+          <p>Progresso: {progress}%</p>
           <div className="w-full bg-neutral-300 h-3 rounded">
             <div
-              className="bg-sky-950 h-3 rounded transition-all"
+              className="bg-sky-950 h-3 rounded"
               style={{ width: `${progress}%` }}
             />
           </div>
         </div>
       )}
 
-      {/* Correção manual */}
-      {Object.keys(detectedAnswers).length > 0 && (
-        <div className="bg-white rounded-2xl shadow p-6 mb-8">
-          <h3 className="text-xl font-semibold text-sky-950 mb-4">
-            Corrigir Respostas
-          </h3>
+      {current && (
+        <div className="bg-white rounded-2xl shadow p-6 max-w-xl mx-auto">
+          <p className="text-sm mb-2">
+            Questão {currentQuestionIndex + 1} de {entries.length}
+          </p>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-            {Object.entries(detectedAnswers).map(([question, answer]) => (
-              <div
-                key={question}
-                className="flex justify-between items-center p-3 bg-sky-50 rounded-lg border"
-              >
-                <span className="font-medium">{question}</span>
-                <input
-                  type="text"
-                  maxLength={1}
-                  value={answer}
-                  onChange={(e) =>
-                    setDetectedAnswers({
-                      ...detectedAnswers,
-                      [question]: e.target.value
-                        .toUpperCase()
-                        .replace(/[^A-E]/g, ""),
-                    })
-                  }
-                  className="w-10 text-center font-bold border rounded focus:ring-2 focus:ring-sky-950"
-                />
-              </div>
-            ))}
+          <div
+            className={`p-5 rounded-xl border ${current[1].source === "manual"
+              ? "bg-sky-50 border-sky-400"
+              : "bg-emerald-50 border-emerald-400"
+              }`}
+          >
+            <div className="flex justify-between items-center">
+              <span className="text-lg font-semibold">{current[0]}</span>
+
+              <input
+                ref={answerInputRef}
+                disabled={!editing}
+                maxLength={1}
+                value={current[1].finalValue}
+                onChange={(e) => {
+                  const value = e.target.value
+                    .toUpperCase()
+                    .replace(/[^A-E]/g, "");
+
+                  setDetectedAnswers((prev) => ({
+                    ...prev,
+                    [current[0]]: {
+                      ...prev[current[0]],
+                      finalValue: value,
+                      source:
+                        value !== prev[current[0]].ocrValue
+                          ? "manual"
+                          : "ocr",
+                    },
+                  }));
+                }}
+                className="w-12 h-12 text-center text-xl font-bold border-2 rounded-lg"
+              />
+            </div>
+
+            <p className="mt-2 text-sm">
+              {current[1].source === "manual"
+                ? "Resposta ajustada manualmente"
+                : "Resposta detectada automaticamente"}
+            </p>
           </div>
 
-          <button
-            onClick={handleConfirmStudent}
-            className="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-500"
-          >
-            Confirmar e Salvar Aluno
-          </button>
-        </div>
-      )}
+          <div className="flex justify-center gap-4 mt-6">
+            <button
+              onClick={() => {
+                setEditing(false);
+                setCurrentQuestionIndex((i) =>
+                  Math.min(i + 1, entries.length - 1)
+                );
+              }}
+              className="px-6 py-2 bg-emerald-600 text-white rounded-lg"
+            >
+              Salvar resposta
+            </button>
 
-      {/* Alunos processados */}
-      {students.length > 0 && (
-        <div className="bg-white rounded-xl shadow p-6">
-          <h3 className="text-xl font-semibold text-sky-950 mb-4">
-            Alunos Processados
-          </h3>
-          <ul className="space-y-2">
-            {students.map((s, idx) => (
-              <li
-                key={idx}
-                className="border p-3 rounded-md flex justify-between"
+            <button
+              onClick={() => {
+                setEditing(true);
+
+                // pequeno delay para garantir que o input seja habilitado
+                setTimeout(() => {
+                  answerInputRef.current?.focus();
+                }, 0);
+              }}
+              className="px-6 py-2 bg-sky-950 text-white rounded-lg"
+            >
+              Alterar resposta
+            </button>
+          </div>
+
+          {currentQuestionIndex === entries.length - 1 && (
+            <div className="text-center mt-6">
+              <button
+                onClick={handleConfirmStudent}
+                className="px-8 py-3 bg-emerald-700 text-white rounded-xl"
               >
-                <span className="font-medium">{s.name}</span>
-                <span className="text-neutral-500">
-                  {Object.keys(s.answers).length} respostas
-                </span>
-              </li>
-            ))}
-          </ul>
+                Confirmar todas as respostas
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

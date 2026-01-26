@@ -64,7 +64,7 @@ const Teacher = () => {
                             DOWNLOAD CERTIFICADOS
                         </button>
                         <a href="/proof-correction" className="px-4 text-center py-2 rounded-lg border border-sky-950 text-sky-950 hover:bg-sky-950 hover:text-white transition">
-                            CORREÇÃO DE PROVAS
+                            CORREÇÃO OBR TEÓRICA
                         </a>
 
                         <input
